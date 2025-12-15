@@ -13,49 +13,6 @@ The Smart Travel Platform is a distributed microservices system built with Sprin
 
 ---
 
-## System Architecture
-
-```
-┌─────────────────────────────────────────────────────────────────────────┐
-│                        BOOKING SERVICE (PORT 8084)                      │
-│                    (MAIN ORCHESTRATOR / GATEWAY)                        │
-│                                                                         │
-│  ┌──────────────────────────────────────────────────────────────────┐  │
-│  │ BookingController: POST /bookings, GET /bookings/{id}            │  │
-│  │ BookingService: Complete orchestration workflow (8 steps)        │  │
-│  └──────────────────────────────────────────────────────────────────┘  │
-│                                                                         │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐                 │
-│  │   Feign      │  │   Feign      │  │ WebClient    │                 │
-│  │  Clients     │  │  Clients     │  │   Calls      │                 │
-│  └──────────────┘  └──────────────┘  └──────────────┘                 │
-│         │                  │                 │                         │
-└─────────┼──────────────────┼─────────────────┼─────────────────────────┘
-          │                  │                 │
-    ┌─────▼────┐      ┌──────▼─────┐   ┌──────▼──────┐
-    │  Flight  │      │   Hotel    │   │   User     │  ┌────────────┐
-    │ Service  │      │  Service   │   │  Service   │  │  Payment   │
-    │ (8082)   │      │  (8083)    │   │  (8081)    │  │  Service   │
-    │          │      │            │   │            │  │  (8085)    │
-    │ GET      │      │ GET        │   │ GET        │  │            │
-    │ /flights │      │ /hotels    │   │ /users     │  │ POST       │
-    │ /{id}    │      │ /{id}      │   │ /{id}      │  │ /payments  │
-    │          │      │            │   │            │  │            │
-    └──────────┘      └────────────┘   └────────────┘  └────────────┘
-                                                              │
-                                                         WebClient
-                                                           Call
-                                                              │
-                                                     ┌────────▼──────────┐
-                                                     │ Notification       │
-                                                     │ Service (8086)     │
-                                                     │                    │
-                                                     │ POST /notify       │
-                                                     └────────────────────┘
-```
-
----
-
 ## Microservices Details
 
 ### 1. User Service (Port 8081)
@@ -275,83 +232,6 @@ The Smart Travel Platform is a distributed microservices system built with Sprin
 
 When a client sends a POST request to `http://localhost:8084/bookings`, the following orchestration flow occurs:
 
-### Step-by-Step Flow:
-
-```
-1. CLIENT
-   └─→ POST /bookings (userId: 1, flightId: 1, hotelId: 1, travelDate: 2025-12-25)
-       │
-       └─→ BOOKING SERVICE (8084)
-           │
-           ├─ STEP 1: Validate User
-           │   └─→ WebClient GET http://localhost:8081/users/1
-           │       ↓
-           │       USER SERVICE (8081) returns user details
-           │       ↓
-           │       [BOOKING] User validated: 1 ✓
-           │
-           ├─ STEP 2: Check Flight Availability
-           │   └─→ Feign GET http://localhost:8082/flights/1
-           │       ↓
-           │       FLIGHT SERVICE (8082) returns flight details
-           │       ↓
-           │       Extract price: $299.99
-           │
-           ├─ STEP 3: Check Hotel Availability
-           │   └─→ Feign GET http://localhost:8083/hotels/1
-           │       ↓
-           │       HOTEL SERVICE (8083) returns hotel details
-           │       ↓
-           │       Extract price: $150.00/night
-           │
-           ├─ STEP 4: Calculate Total Cost
-           │   └─→ totalCost = flightPrice + hotelPrice
-           │       └─→ $299.99 + $150.00 = $449.99
-           │
-           ├─ STEP 5: Create Booking (PENDING)
-           │   └─→ Store in HashMap with status = PENDING
-           │       └─→ [BOOKING] Created booking: 1 with status: PENDING ✓
-           │
-           ├─ STEP 6: Process Payment
-           │   └─→ WebClient POST http://localhost:8085/payments
-           │       │   Request: { bookingId: 1, amount: 449.99 }
-           │       │
-           │       PAYMENT SERVICE (8085)
-           │       │
-           │       ├─ Process payment
-           │       ├─ Generate UUID transaction ID
-           │       └─ Call back to BOOKING SERVICE
-           │           └─→ POST http://localhost:8084/bookings/confirm
-           │               │
-           │               BOOKING SERVICE (8084)
-           │               └─ /bookings/confirm endpoint updates booking status
-           │
-           │       └─→ Return payment response with transactionId
-           │
-           ├─ STEP 7: Send Notification
-           │   └─→ WebClient POST http://localhost:8086/notify
-           │       │   Request: { bookingId: 1, message: "Booking confirmed..." }
-           │       │
-           │       NOTIFICATION SERVICE (8086)
-           │       ├─ Log [NOTIFICATION] message to console
-           │       └─ Return success response
-           │
-           ├─ STEP 8: Update Booking Status (CONFIRMED)
-           │   └─→ Update HashMap entry: booking.status = CONFIRMED
-           │       └─→ [BOOKING] Updated booking 1 to status: CONFIRMED ✓
-           │
-           └─→ RETURN to CLIENT
-               {
-                 "bookingId": 1,
-                 "userId": 1,
-                 "flightId": 1,
-                 "hotelId": 1,
-                 "travelDate": "2025-12-25",
-                 "totalCost": 449.99,
-                 "status": "CONFIRMED"
-               }
-```
-
 ### Console Output:
 
 ```
@@ -509,68 +389,6 @@ Each request has built-in tests:
 
 Look at the **Tests** tab after sending a request to see results.
 
----
-
-## Service Dependencies
-
-```
-                    ┌──────────────────┐
-                    │  Client Request  │
-                    └────────┬─────────┘
-                             │
-                    ┌────────▼──────────┐
-                    │ Booking Service   │
-                    │     (8084)        │
-                    └────────┬──────────┘
-                             │
-                ┌────────────┼────────────┬──────────────┐
-                │            │            │              │
-        ┌───────▼────┐  ┌────▼─────┐  ┌──▼──────┐  ┌────▼─────────┐
-        │   User     │  │  Flight  │  │  Hotel  │  │   Payment    │
-        │  Service   │  │ Service  │  │Service  │  │   Service    │
-        │  (8081)    │  │  (8082)  │  │ (8083)  │  │   (8085)     │
-        └────────────┘  └──────────┘  └─────────┘  └────┬─────────┘
-                                                          │
-                                                ┌─────────▼──────────┐
-                                                │ Notification       │
-                                                │ Service (8086)     │
-                                                └────────────────────┘
-```
-
----
-
-## Hardcoded Test Data
-
-### Users:
-
-| ID  | Name        | Email           |
-| --- | ----------- | --------------- |
-| 1   | John Doe    | john@travel.com |
-| 2   | Jane Smith  | jane@travel.com |
-| 3   | Bob Johnson | bob@travel.com  |
-
-### Flights:
-
-| ID  | Origin   | Destination   | Available | Price   |
-| --- | -------- | ------------- | --------- | ------- |
-| 1   | New York | Los Angeles   | ✓         | $299.99 |
-| 2   | Chicago  | Miami         | ✓         | $349.99 |
-| 3   | Boston   | Denver        | ✓         | $329.99 |
-| 4   | Seattle  | San Francisco | ✓         | $289.99 |
-| 5   | Dallas   | Houston       | ✓         | $199.99 |
-
-### Hotels:
-
-| ID  | Name              | Available | Price/Night |
-| --- | ----------------- | --------- | ----------- |
-| 1   | Grand Plaza Hotel | ✓         | $150.00     |
-| 2   | Beachfront Resort | ✓         | $200.00     |
-| 3   | Mountain Lodge    | ✓         | $175.00     |
-| 4   | Downtown Plaza    | ✓         | $125.00     |
-| 5   | Luxury Penthouse  | ✓         | $350.00     |
-
----
-
 ## Quick Start Guide
 
 ### 1. Build All Services
@@ -613,21 +431,6 @@ curl -X POST http://localhost:8084/bookings \
   -H "Content-Type: application/json" \
   -d '{"userId": 1, "flightId": 1, "hotelId": 1, "travelDate": "2025-12-25"}' | jq
 ```
-
----
-
-## Technology Stack
-
-| Component              | Technology                 | Version                 |
-| ---------------------- | -------------------------- | ----------------------- |
-| **Framework**          | Spring Boot                | 3.5.8                   |
-| **Language**           | Java                       | 17                      |
-| **REST Client**        | Spring WebFlux (WebClient) | Native in Spring Boot   |
-| **Declarative Client** | Spring Cloud OpenFeign     | Latest                  |
-| **Build Tool**         | Maven                      | 3.x with mvnw wrapper   |
-| **Serialization**      | Jackson JSON               | Included in Spring Boot |
-| **Annotations**        | Lombok                     | Latest                  |
-| **HTTP Protocol**      | REST/JSON                  | HTTP/1.1                |
 
 ---
 
@@ -720,6 +523,3 @@ The Smart Travel Platform demonstrates a complete microservices ecosystem with:
 **Start building with:** `SmartTravelPlatform.postman_collection.json`
 
 ---
-
-_Last Updated: December 2025_  
-_Repository: nivindulakshitha/smart-travel-platform_
