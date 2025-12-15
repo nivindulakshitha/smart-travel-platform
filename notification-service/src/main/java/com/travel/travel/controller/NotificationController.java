@@ -12,13 +12,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/notify")
 public class NotificationController {
-    
+
     private final NotificationService notificationService;
-    
+
     public NotificationController(NotificationService notificationService) {
         this.notificationService = notificationService;
     }
-    
+
     @PostMapping
     public ResponseEntity<NotificationResponse> notify(@RequestBody NotificationRequest request) {
         notificationService.sendNotification(request);
