@@ -1,0 +1,743 @@
+{
+	"info": {
+		"_postman_id": "smart-travel-platform-collection",
+		"name": "Smart Travel Platform",
+		"description": "Complete microservices collection for Smart Travel Platform demonstrating inter-service communication patterns.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "noauth"
+	},
+	"item": [
+		{
+			"name": "User Service (Port 8081)",
+			"description": "User information provider service",
+			"item": [
+				{
+					"name": "Get User by ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response has userId', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('userId');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8081/users/1",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8081",
+							"path": ["users", "1"]
+						},
+						"description": "Retrieve user information by user ID. Returns userId, name, and email."
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8081/users/1",
+									"protocol": "http",
+									"host": ["localhost"],
+									"port": "8081",
+									"path": ["users", "1"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n  \"userId\": 1,\n  \"name\": \"John Doe\",\n  \"email\": \"john@travel.com\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Get User 2",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8081/users/2",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8081",
+							"path": ["users", "2"]
+						}
+					}
+				},
+				{
+					"name": "Get User 3",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8081/users/3",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8081",
+							"path": ["users", "3"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Flight Service (Port 8082)",
+			"description": "Flight availability and pricing service",
+			"item": [
+				{
+					"name": "Get Flight 1 - NYC to LA",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Flight has all required fields', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('flightId');",
+									"    pm.expect(jsonData).to.have.property('price');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8082/flights/1",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8082",
+							"path": ["flights", "1"]
+						},
+						"description": "Get flight details including availability and price"
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8082/flights/1",
+									"protocol": "http",
+									"host": ["localhost"],
+									"port": "8082",
+									"path": ["flights", "1"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n  \"flightId\": 1,\n  \"origin\": \"New York\",\n  \"destination\": \"Los Angeles\",\n  \"available\": true,\n  \"price\": 299.99\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Flight 2 - Chicago to Miami",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8082/flights/2",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8082",
+							"path": ["flights", "2"]
+						}
+					}
+				},
+				{
+					"name": "Get Flight 3 - Boston to Denver",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8082/flights/3",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8082",
+							"path": ["flights", "3"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Hotel Service (Port 8083)",
+			"description": "Hotel availability and pricing service",
+			"item": [
+				{
+					"name": "Get Hotel 1 - Grand Plaza",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Hotel has all required fields', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('hotelId');",
+									"    pm.expect(jsonData).to.have.property('pricePerNight');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8083/hotels/1",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8083",
+							"path": ["hotels", "1"]
+						},
+						"description": "Get hotel details including availability and nightly rate"
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8083/hotels/1",
+									"protocol": "http",
+									"host": ["localhost"],
+									"port": "8083",
+									"path": ["hotels", "1"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n  \"hotelId\": 1,\n  \"name\": \"Grand Plaza Hotel\",\n  \"available\": true,\n  \"pricePerNight\": 150.00\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Hotel 2 - Beachfront Resort",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8083/hotels/2",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8083",
+							"path": ["hotels", "2"]
+						}
+					}
+				},
+				{
+					"name": "Get Hotel 3 - Mountain Lodge",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8083/hotels/3",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8083",
+							"path": ["hotels", "3"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Payment Service (Port 8085)",
+			"description": "Payment processing service",
+			"item": [
+				{
+					"name": "Process Payment",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Payment response has transactionId', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('transactionId');",
+									"    pm.expect(jsonData.success).to.equal(true);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"bookingId\": 1,\n  \"amount\": 449.99\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8085/payments",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8085",
+							"path": ["payments"]
+						},
+						"description": "Process payment for a booking. Calls Booking Service to confirm the booking."
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"bookingId\": 1,\n  \"amount\": 449.99\n}"
+								},
+								"url": {
+									"raw": "http://localhost:8085/payments",
+									"protocol": "http",
+									"host": ["localhost"],
+									"port": "8085",
+									"path": ["payments"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n  \"success\": true,\n  \"message\": \"Payment processed successfully\",\n  \"transactionId\": \"550e8400-e29b-41d4-a716-446655440000\"\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Notification Service (Port 8086)",
+			"description": "Notification service for booking updates",
+			"item": [
+				{
+					"name": "Send Notification",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Notification sent successfully', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.equal(true);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"bookingId\": 1,\n  \"message\": \"Your booking has been confirmed for 2025-12-25\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8086/notify",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8086",
+							"path": ["notify"]
+						},
+						"description": "Send notification to user about their booking"
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"bookingId\": 1,\n  \"message\": \"Your booking has been confirmed for 2025-12-25\"\n}"
+								},
+								"url": {
+									"raw": "http://localhost:8086/notify",
+									"protocol": "http",
+									"host": ["localhost"],
+									"port": "8086",
+									"path": ["notify"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n  \"success\": true,\n  \"message\": \"Notification sent successfully\"\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Booking Service (Port 8084) - MAIN ORCHESTRATOR",
+			"description": "Main orchestrator service that coordinates all microservices",
+			"item": [
+				{
+					"name": "Create Booking",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Booking created with CONFIRMED status', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('bookingId');",
+									"    pm.expect(jsonData.status).to.equal('CONFIRMED');",
+									"    pm.expect(jsonData).to.have.property('totalCost');",
+									"});",
+									"",
+									"// Save bookingId for subsequent requests",
+									"var jsonData = pm.response.json();",
+									"pm.environment.set('bookingId', jsonData.bookingId);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userId\": 1,\n  \"flightId\": 1,\n  \"hotelId\": 1,\n  \"travelDate\": \"2025-12-25\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8084/bookings",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8084",
+							"path": ["bookings"]
+						},
+						"description": "Create a new booking. This triggers the complete orchestration workflow:\n1. Validate user (User Service)\n2. Check flight availability (Flight Service)\n3. Check hotel availability (Hotel Service)\n4. Calculate total cost\n5. Create booking with PENDING status\n6. Process payment (Payment Service)\n7. Send notification (Notification Service)\n8. Update booking to CONFIRMED\n\nExpected total cost: Flight price + Hotel price (for 1 night)"
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"userId\": 1,\n  \"flightId\": 1,\n  \"hotelId\": 1,\n  \"travelDate\": \"2025-12-25\"\n}"
+								},
+								"url": {
+									"raw": "http://localhost:8084/bookings",
+									"protocol": "http",
+									"host": ["localhost"],
+									"port": "8084",
+									"path": ["bookings"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n  \"bookingId\": 1,\n  \"userId\": 1,\n  \"flightId\": 1,\n  \"hotelId\": 1,\n  \"travelDate\": \"2025-12-25\",\n  \"totalCost\": 449.99,\n  \"status\": \"CONFIRMED\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Booking by ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Booking details are complete', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('bookingId');",
+									"    pm.expect(jsonData).to.have.property('totalCost');",
+									"    pm.expect(jsonData).to.have.property('status');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8084/bookings/1",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8084",
+							"path": ["bookings", "1"]
+						},
+						"description": "Retrieve booking details by booking ID"
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8084/bookings/1",
+									"protocol": "http",
+									"host": ["localhost"],
+									"port": "8084",
+									"path": ["bookings", "1"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n  \"bookingId\": 1,\n  \"userId\": 1,\n  \"flightId\": 1,\n  \"hotelId\": 1,\n  \"travelDate\": \"2025-12-25\",\n  \"totalCost\": 449.99,\n  \"status\": \"CONFIRMED\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Create Booking - User 2, Flight 2, Hotel 2",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userId\": 2,\n  \"flightId\": 2,\n  \"hotelId\": 2,\n  \"travelDate\": \"2026-01-15\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8084/bookings",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8084",
+							"path": ["bookings"]
+						},
+						"description": "Create another booking with different user, flight, and hotel"
+					}
+				},
+				{
+					"name": "Create Booking - User 3, Flight 3, Hotel 3",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userId\": 3,\n  \"flightId\": 3,\n  \"hotelId\": 3,\n  \"travelDate\": \"2026-02-20\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8084/bookings",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8084",
+							"path": ["bookings"]
+						},
+						"description": "Create third booking to test with different data"
+					}
+				}
+			]
+		},
+		{
+			"name": "Error Scenarios",
+			"description": "Test error handling in microservices",
+			"item": [
+				{
+					"name": "Get Non-existent User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 404', function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test('Error response is present', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('error');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8081/users/999",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8081",
+							"path": ["users", "999"]
+						},
+						"description": "Attempt to get a user that doesn't exist - should return 404"
+					}
+				},
+				{
+					"name": "Get Non-existent Flight",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8082/flights/999",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8082",
+							"path": ["flights", "999"]
+						},
+						"description": "Attempt to get a flight that doesn't exist - should return 404"
+					}
+				},
+				{
+					"name": "Create Booking with Invalid User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 400', function () {",
+									"    pm.response.to.have.status(400);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userId\": 999,\n  \"flightId\": 1,\n  \"hotelId\": 1,\n  \"travelDate\": \"2025-12-25\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8084/bookings",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8084",
+							"path": ["bookings"]
+						},
+						"description": "Try to create booking with non-existent user - should fail at validation step"
+					}
+				}
+			]
+		}
+	]
+}
